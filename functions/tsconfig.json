@@ -11,5 +11,7 @@
   "compileOnSave": true,
   "include": [
     "src"
-  ]
+  ],
+  "allowJs": true,
+  "allowSyntheticDefaultImports": true
 }

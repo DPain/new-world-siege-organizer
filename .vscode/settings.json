@@ -1,0 +1,10 @@
+{
+  "vetur.validation.template": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
+  "typescript.format.insertSpaceBeforeFunctionParenthesis": true,
+  "prettier.singleQuote": true,
+  "prettier.htmlWhitespaceSensitivity": "ignore"
+}
