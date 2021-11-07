@@ -27,13 +27,15 @@ module.exports = {
     'import',
   ],
   rules: {
+    "space-before-function-paren": 0,
     '@typescript-eslint/no-var-requires': 0,
+    'import/no-unresolved': 0,
     '@typescript-eslint/no-explicit-any': 0,
     'quotes': ['error', 'single'],
     'object-curly-spacing': ['error', 'always'],
-    'space-before-function-paren': ['error', 'always'],
     'new-cap': ['error', { 'capIsNew': false }],
     'indent': ['error', 2],
+    'valid-jsdoc': 0,
     'max-len': ['warn', { 'code': 80, 'tabWidth': 2, 'ignoreUrls': true, 'ignoreComments': true, 'ignoreTrailingComments': true, 'ignoreStrings': true, 'ignoreTemplateLiterals': true}],
   },
 };

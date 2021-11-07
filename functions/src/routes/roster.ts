@@ -2,10 +2,12 @@ import { Router, Request, Response } from 'express';
 import { DataSnapshot } from '@firebase/database-types';
 
 import { App } from '../firebase';
-import { Region } from '../models/region';
+import { Region } from '../enums/region';
 import { Roster } from '../models/roster';
-import { Role } from '../models/role';
 import { Player } from '../models/player';
+import { Role } from '../enums/role';
+import { getValidRegion, parseLimit } from '../util/util';
+import { MAX_LENGTH_2D, MAX_LENGTH_INNER } from '../const';
 
 const router = Router();
 const db = App.database();
@@ -13,21 +15,18 @@ const db = App.database();
 /**
  * Returns the current siege roster for a given region.
  */
-router.post('/', (req: Request, res: Response) => {
+router.get('/:region', (req: Request, res: Response) => {
   // ?. is called optional chaining.
-  let regionString = req.body.region?.toUpperCase();
+  const regionString = req.params.region?.toUpperCase();
 
-  let region: Region;
-  if (Object.values(Region).some((reg: string) => reg === regionString)) {
-    region = <Region>regionString;
-  } else {
+  const region: Region | null = getValidRegion(regionString);
+  if (!region) {
     res.status(400).send({
       msg: 'Incorrect region name!',
     });
     return;
   }
 
-  // Firebase doesn't offer descending order. Need to reverse the output.
   const ref = db.ref('/roster').child(region);
   ref
     .once('value')
@@ -45,26 +44,25 @@ router.post('/', (req: Request, res: Response) => {
  */
 router.post('/', (req: Request, res: Response) => {
   // ?. is called optional chaining.
-  let regionString = req.body.region?.toUpperCase();
+  const regionString = req.body.region?.toUpperCase();
 
-  let region: Region;
-  if (Object.values(Region).some((reg: string) => reg === regionString)) {
-    region = <Region>regionString;
-  } else {
+  const region: Region | null = getValidRegion(regionString);
+  if (!region) {
     res.status(400).send({
       msg: 'Incorrect region name!',
     });
     return;
   }
 
-  let limitJson: any = req.body.limit;
-  let players: Player[][] = new Array(10).map(() => new Array());
+  // Generating map input for parseLimit helper function.
+  const limit: Map<Role, number> = parseLimit(req.body.limit);
+  const players: Player[][] = [[]];
 
-  const roster: Roster = new Roster(region, parseLimit(limitJson), players);
+  const roster: Roster = new Roster(region, limit, players);
 
   const ref = db.ref('/roster').child(region);
   ref
-    .push(roster)
+    .set(roster.toJson())
     .then(() => {
       res.status(200).send({ msg: 'Success!' });
       return;
@@ -75,24 +73,60 @@ router.post('/', (req: Request, res: Response) => {
     });
 });
 
-function parseLimit(limit: any): Record<Role, number> {
-  let result: Record<Role, number> = {
-    [Role.MELEE]: -1,
-    [Role.HEALER]: -1,
-    [Role.RANGE]: -1,
-    [Role.MAGE]: -1,
-    [Role.SIEGE]: -1,
-  };
+/**
+ * Updates the region's details.
+ * Available changes are: players, limit
+ */
+router.post('/:region', (req: Request, res: Response) => {
+  // ?. is called optional chaining.
+  const regionString = req.params.region?.toUpperCase();
+  const newPlayers: any[][] = req.body.players;
+  const newLimit = req.body.limit;
 
-  for (let obj in Role) {
-    let val: number = limit[obj];
-    if (val && val <= 50 && val >= -1) {
-      result[<Role>obj] = val;
-    }
+  // Handles region param.
+  const region: Region | null = getValidRegion(regionString);
+  if (!region) {
+    res.status(400).send({
+      msg: 'Incorrect region name!',
+    });
+    return;
   }
 
-  return result;
-}
+  // Handles players field.
+  let players: Player[][];
+  if (newPlayers) {
+    players = newPlayers.slice(0, MAX_LENGTH_2D).map((arr) =>
+      arr.slice(0, MAX_LENGTH_INNER).map((el) => {
+        const entry: Player = Player.fromJson(el);
+        return entry;
+      })
+    );
+  } else {
+    players = [[]];
+  }
+
+  let limit: Map<Role, number>;
+  if (newLimit) {
+    // Handles limit field.
+    limit = parseLimit(req.body.limit);
+  } else {
+    limit = new Map<Role, number>();
+  }
+
+  const roster: Roster = new Roster(region, limit, players);
+
+  const ref = db.ref('/roster').child(region);
+  ref
+    .update(roster.toJson())
+    .then(() => {
+      res.status(200).send({ msg: 'Success!' });
+      return;
+    })
+    .catch((error: any) => {
+      console.error(error);
+      res.status(500).send();
+    });
+});
 
 const RosterRouter: Router = router;
 

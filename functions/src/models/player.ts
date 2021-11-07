@@ -1,9 +1,9 @@
-import { Role } from './role';
+import { Role } from '../enums/role';
 
 /**
  * Class for Player.
  */
-export class Player {
+class Player {
   name: string;
   gearscore: number;
   roles: Role[];
@@ -19,4 +19,38 @@ export class Player {
     this.gearscore = gearscore;
     this.roles = roles;
   }
+
+  /**
+   * Creates a Player class from a PlayerJson.
+   * @param {PlayerJson} json json interface for Player.
+   * @returns {Player} class representation of the json.
+   */
+  static fromJson(json: PlayerJson): Player {
+    const name: string = json.name;
+    const gearscore: number = json.gearscore;
+    const roles: Role[] = json.roles;
+
+    const result = new Player(name, gearscore, roles);
+    return result;
+  }
+
+  /**
+   * Creates a Json representation of the Player primarily used for serializing before uploading to Firebase.
+   * @returns {any} Object of the Player class.
+   */
+  toJson(): any {
+    const json: any = {};
+    json['name'] = this.name;
+    json['gearscore'] = this.gearscore;
+    json['roles'] = this.roles;
+    return json;
+  }
 }
+
+interface PlayerJson {
+  name: string;
+  gearscore: number;
+  roles: any;
+}
+
+export { Player, PlayerJson };

@@ -1,0 +1,4 @@
+const MAX_LENGTH_2D = 10;
+const MAX_LENGTH_INNER = 5;
+
+export { MAX_LENGTH_2D, MAX_LENGTH_INNER };
