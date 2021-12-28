@@ -1,0 +1,10 @@
+{
+  "htmlWhitespaceSensitivity": "ignore",
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "printWidth": 80,
+  "useTabs": false,
+  "spaceBeforeFunctionParen": true,
+  "bracketSpacing": true,
+  "endOfLine": "auto"
+}

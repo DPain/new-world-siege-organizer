@@ -1,0 +1,5 @@
+{
+  "server_url": "https://us-central1-rim-wealth-tracker-322501.cloudfunctions.net/api",
+  "wealth_url": "https://us-central1-rim-wealth-tracker-322501.cloudfunctions.net/api/wealth",
+  "news_url": "https://us-central1-rim-wealth-tracker-322501.cloudfunctions.net/api/news"
+}

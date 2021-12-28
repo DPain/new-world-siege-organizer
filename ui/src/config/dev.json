@@ -1,0 +1,5 @@
+{
+  "server_url": "http://localhost:5001/rim-wealth-tracker-322501/us-central1/api",
+  "wealth_url": "http://localhost:5001/rim-wealth-tracker-322501/us-central1/api/wealth",
+  "news_url": "http://localhost:5001/rim-wealth-tracker-322501/us-central1/api/news"
+}
